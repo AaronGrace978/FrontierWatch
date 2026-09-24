@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>FrontierWatch</title>
+<style>
+  :root {
+    --bg: #0a0b0d;
+    --panel: #12141a;
+    --panel2: #181b22;
+    --line: rgba(201, 162, 39, 0.22);
+    --text: #f3efe4;
+    --dim: #9a9384;
+    --gold: #d4af37;
+    --gold2: #f0d78c;
+    --high: #f07167;
+    --med: #e0a454;
+    --low: #7d8a99;
+    --ok: #7dcea0;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    width: 440px;
+    max-height: 600px;
+    overflow-y: auto;
+    background:
+      radial-gradient(1200px 280px at 10% -40%, rgba(212, 175, 55, 0.12), transparent 55%),
+      var(--bg);
+    color: var(--text);
+    font-family: "Segoe UI", system-ui, sans-serif;
+    font-size: 13px;
+  }
+  header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px 10px;
+    border-bottom: 1px solid var(--line);
+  }
+  .mark {
+    width: 34px; height: 34px;
+    border-radius: 10px;
+    background: linear-gradient(160deg, #3a2f12, #1a160c);
+    border: 1px solid var(--gold);
+    color: var(--gold2);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    font-size: 11px;
+  }
+  h1 { font-size: 15px; font-weight: 650; letter-spacing: 0.4px; }
+  .sub { color: var(--dim); font-size: 11px; margin-top: 2px; }
+  .pill {
+    margin-left: auto;
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--gold2);
+    border: 1px solid var(--line);
+    padding: 3px 8px;
+    border-radius: 999px;
+  }
+  .tabs {
+    display: flex;
+    gap: 4px;
+    padding: 10px 12px 0;
+  }
+  .tabs button {
+    flex: 1;
+    background: transparent;
+    color: var(--dim);
+    border: 1px solid transparent;
+    border-radius: 8px;
+    padding: 7px 0;
+    cursor: pointer;
+    font-size: 12px;
+  }
+  .tabs button.on {
+    color: var(--gold2);
+    background: var(--panel);
+    border-color: var(--line);
+  }
+  .stats {
+    display: flex;
+    gap: 8px;
+    padding: 12px 14px 8px;
+  }
+  .stat {
+    flex: 1;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 9px 8px;
+    text-align: center;
+  }
+  .stat .num { font-size: 18px; font-weight: 700; }
+  .stat .lbl { font-size: 10px; color: var(--dim); text-transform: uppercase; letter-spacing: 0.6px; margin-top: 2px; }
+  .stat.high .num { color: var(--high); }
+  .stat.med .num { color: var(--med); }
+  .stat.ok .num { color: var(--ok); }
+  .panel { display: none; padding: 4px 12px 14px; }
+  .panel.on { display: block; }
+  .origin-card {
+    background: linear-gradient(180deg, var(--panel2), var(--panel));
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 12px;
+    margin-bottom: 10px;
+  }
+  .origin-card h2 { font-size: 12px; color: var(--gold); letter-spacing: 0.8px; text-transform: uppercase; margin-bottom: 8px; }
+  .lab-name { font-size: 16px; font-weight: 650; }
+  .lab-meta { color: var(--dim); font-size: 12px; margin: 4px 0 8px; line-height: 1.45; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip {
+    font-size: 11px;
+    background: #0a0b0d;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 3px 8px;
+    color: var(--gold2);
+  }
+  .entry, .finding-row {
+    background: var(--panel);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-left: 3px solid var(--med);
+    border-radius: 8px;
+    padding: 9px 10px;
+    margin-bottom: 8px;
+  }
+  .entry.high, .finding-row.high { border-left-color: var(--high); }
+  .entry.low, .finding-row.low { border-left-color: var(--low); }
+  .url { color: var(--gold2); font-size: 12px; word-break: break-all; margin-bottom: 4px; }
+  .meta { color: var(--dim); font-size: 11px; margin-bottom: 4px; }
+  .finding {
+    font-size: 11px;
+    background: #0a0b0d;
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 6px;
+    padding: 6px 7px;
+    margin-top: 5px;
+    word-break: break-word;
+  }
+  .sev, .conf {
+    display: inline-block;
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 1px 5px;
+    border-radius: 3px;
+    margin-right: 5px;
+  }
+  .sev.high { background: var(--high); color: #1a0a08; }
+  .sev.medium { background: var(--med); color: #1a1208; }
+  .sev.low { background: var(--low); color: #0a0b0d; }
+  .conf { background: #22252e; color: var(--dim); }
+  .empty { text-align: center; color: var(--dim); padding: 28px 16px; line-height: 1.6; font-size: 12px; }
+  .actions { display: flex; gap: 8px; padding: 0 14px 12px; }
+  .actions button, .ghost {
+    flex: 1;
+    background: var(--panel);
+    color: var(--text);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 7px 0;
+    font-size: 12px;
+    cursor: pointer;
+  }
+  .actions button:hover, .ghost:hover { border-color: var(--gold); color: var(--gold2); }
+  .atlas {
+    display: grid;
+    gap: 8px;
+  }
+</style>
+</head>
+<body>
+  <header>
+    <div class="mark">FW</div>
+    <div>
+      <h1>FrontierWatch</h1>
+      <div class="sub">Origin-aware frontier activity monitor</div>
+    </div>
+    <div class="pill">Local</div>
+  </header>
+
+  <div class="tabs">
+    <button class="on" data-tab="live" id="tabLive">This page</button>
+    <button data-tab="log" id="tabLog">Alert log</button>
+    <button data-tab="atlas" id="tabAtlas">Origin atlas</button>
+  </div>
+
+  <div class="stats">
+    <div class="stat high"><div class="num" id="statHigh">0</div><div class="lbl">High</div></div>
+    <div class="stat med"><div class="num" id="statMed">0</div><div class="lbl">Medium</div></div>
+    <div class="stat ok"><div class="num" id="statPages">0</div><div class="lbl">Pages flagged</div></div>
+  </div>
+
+  <div class="panel on" id="panelLive">
+    <div id="liveBox"></div>
+    <div class="actions"><button class="ghost" id="btnRescan">Rescan this page</button></div>
+  </div>
+
+  <div class="panel" id="panelLog">
+    <div class="actions">
+      <button id="btnExport">Export log</button>
+      <button id="btnClear">Clear log</button>
+    </div>
+    <div id="list"></div>
+  </div>
+
+  <div class="panel" id="panelAtlas">
+    <div class="atlas" id="atlas"></div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
